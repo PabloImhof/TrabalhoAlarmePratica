@@ -19,3 +19,6 @@
  - Clicou em BTN 4 (Verifica o número que está armazenado no CONTADOR que passa pelo Debounce é == ao signal que foi armazenado a senha) 
 
 CONSTANT SENHA : STD_LOGIC_VECTOR (15 DOWNTO 0) := "1101";
+
+
+teste pull
