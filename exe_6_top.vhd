@@ -57,7 +57,7 @@ BEGIN
         PORT MAP(
             clock => clock,
             reset => reset,
-            btn => verifica,
+            btn => btn_deb,
             led => led
         );
 

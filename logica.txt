@@ -1,0 +1,21 @@
+ Ainda não tem o PIR ou driver do IR.
+
+ Então 
+
+ VAI TER UMA MÁQUINA DE ESTADO
+ (ATIVO, INATIVO, DISPARANDO) ou mais estados
+
+ 4 botões.
+
+ 1º BTN INCREMENTA LED (CONTADOR ) CNT +'1'
+ - Conforme vai clicando vai preenchendo os led de 1 a 4 e conforme cada 1 ligado é código binário "1111" = 15 decimal
+ 2º BTN SIMULA O PIR ( DISPARA O BUZZER)
+ 
+
+ 3º BTN ARMAR (Sem senha) 
+ 4º BTN DESARMAR (Com senha)
+
+ - Clicou em BTN 3 (armou) 
+ - Clicou em BTN 4 (Verifica o número que está armazenado no CONTADOR que passa pelo Debounce é == ao signal que foi armazenado a senha) 
+
+CONSTANT SENHA : STD_LOGIC_VECTOR (15 DOWNTO 0) := "1101";
