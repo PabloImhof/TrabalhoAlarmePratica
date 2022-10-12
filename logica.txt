@@ -30,7 +30,7 @@ teste pull
 DEFAULT
 DESLIGA LED
 DESLIGA BUZZER
-
+-ateste
 -----
 --passa pelo debouncer
  (IF BOTÃO 2 CLIQUE ) THEN

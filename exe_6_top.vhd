@@ -44,7 +44,7 @@ BEGIN
             async_i => btn_n,
             sync_o => btn_n_sync
         );
-    --batata
+    
     debounce : ENTITY work.debounce
         PORT MAP(
             clock => clock,
