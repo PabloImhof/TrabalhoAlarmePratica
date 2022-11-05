@@ -21,7 +21,7 @@ END alarme;
 ARCHITECTURE alarme OF alarme IS
     TYPE stateFSM IS (DESARMADO, ARMADO, DISPARANDO);
     SIGNAL FSM : stateFSM;
-    CONSTANT SENHA : STD_LOGIC_VECTOR (3 DOWNTO 0) := "0001"; -- SENHA 2
+    CONSTANT SENHA : STD_LOGIC_VECTOR (3 DOWNTO 0) := "0010"; -- SENHA 2
 
 BEGIN
 
@@ -37,6 +37,7 @@ BEGIN
                 WHEN DESARMADO =>
                     buzz_out <= '0';
                     led_out <= (OTHERS => '0');
+                    --7segmentos zerar
                     IF (btn1 = '1') THEN
                         FSM <= ARMADO;
                     END IF;
@@ -47,12 +48,18 @@ BEGIN
                     ELSIF (btn3 = '1' AND SENHA = senha_in) THEN
                         FSM <= DESARMADO;
                     ELSIF (btn3 = '1' AND SENHA /= senha_in) THEN
+                    --aqui poderia pescar os led
+                    -- e dar um bipe diferente
                         FSM <= DISPARANDO;
                     END IF;
+
                 WHEN DISPARANDO =>
                     buzz_out <= '1';
                     IF (btn3 = '1' AND SENHA = senha_in) THEN
                         FSM <= DESARMADO;
+                        -- ELSIF (btn3 = '1' AND SENHA /= senha_in) THEN
+                        -- --aqui poderia pescar os led
+                        -- -- e dar um bipe diferente
                     END IF;
 
             END CASE;

@@ -174,7 +174,7 @@ begin
 			intr <= '0';
 			command <= (others => '0');
 		elsif(rising_edge(clk)) then
-			if(data_cnt = x"20" and ir = '1' and prev_ir = '1') then
+			if(data_cnt = x"20" and ir = '1' and prev_ir = '1' and state = DATA) then
 				command <= receive(15 downto 8);
 				intr <= '1';
 			else
