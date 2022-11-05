@@ -13,7 +13,7 @@ ENTITY buzzer IS
 END buzzer;
 
 ARCHITECTURE buzzer OF buzzer IS
-    SIGNAL cnt : STD_LOGIC_VECTOR (10 DOWNTO 0);
+    SIGNAL cnt : STD_LOGIC_VECTOR (15 DOWNTO 0);
     SIGNAL square : STD_LOGIC;
 
 BEGIN
@@ -23,7 +23,7 @@ BEGIN
         IF (reset = '1') THEN
             cnt <= (OTHERS => '0');
         ELSIF (rising_edge(clock)) THEN
-            cnt <= cnt + '1';            
+            cnt <= cnt + '1';
         END IF;
     END PROCESS;
     PROCESS (clock, reset)

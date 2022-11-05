@@ -7,6 +7,15 @@
 
  4 botões.
 
+
+
+
+1-- BTN 89 ARMAR ALARME
+2-- BTN 90 SIMULA PIR
+3-- BTN 91 DESARMAR(VERIFICA SENHA)
+4-- BTN 88 INCREMENTO BOTÃO -- aqui vai o IR
+
+
  1º BTN INCREMENTA LED (CONTADOR ) CNT +'1'
  - Conforme vai clicando vai preenchendo os led de 1 a 4 e conforme cada 1 ligado é código binário "1111" = 15 decimal
  2º BTN ARMAR (Sem senha) 
@@ -71,3 +80,7 @@ ELSE FSM <= DISPARANDO ENDIF;
 ENDIF;
 
 
+
+
+
+pesquisar FOR GENERATE
