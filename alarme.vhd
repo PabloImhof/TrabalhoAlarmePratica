@@ -14,7 +14,7 @@ ENTITY alarme IS PORT (
     senha_in : IN STD_LOGIC_VECTOR(3 DOWNTO 0);
 
     led_out : OUT STD_LOGIC_VECTOR(3 DOWNTO 0);
-    buzz_out : OUT STD_LOGIC
+    buzz_out : OUT STD_LOGIC 
 );
 END alarme;
 

@@ -3,17 +3,18 @@ USE ieee.std_logic_1164.ALL;
 USE ieee.std_logic_unsigned.ALL;
 USE ieee.std_logic_arith.ALL;
 
-ENTITY main_alarme_top IS(
-    clock : IN STD_LOGIC;
-    reset_n : IN STD_LOGIC;
-    btn1_n : IN STD_LOGIC;
-    btn2_n : IN STD_LOGIC;
-    btn3_n : IN STD_LOGIC;
-    ir_in : IN STD_LOGIC;
+ENTITY main_alarme_top IS
+    PORT (
+        clock : IN STD_LOGIC;
+        reset_n : IN STD_LOGIC;
+        btn1_n : IN STD_LOGIC;
+        btn2_n : IN STD_LOGIC;
+        btn3_n : IN STD_LOGIC;
+        ir_in : IN STD_LOGIC;
 
-    --visor falta
-    led_n : OUT STD_LOGIC_VECTOR(3 DOWNTO 0);
-    buzzer_o : OUT STD_LOGIC
+        --visor falta
+        led_n : OUT STD_LOGIC_VECTOR(3 DOWNTO 0);
+        buzzer_o : OUT STD_LOGIC
     );
 END main_alarme_top;
 
@@ -67,39 +68,6 @@ BEGIN
         END CASE;
     END PROCESS;
 
-    PROCESS (clock, reset)
-    BEGIN
-        IF reset = '1' THEN
-            led <= (OTHERS => '0');
-            buzzer_en <= '0';
-
-        ELSIF rising_edge(clock) THEN
-            IF interrupcao_o = '1' THEN
-
-                IF dig = "1111" THEN
-                    CASE command_o IS
-                            --decrementar vol
-                        WHEN x"E0" =>
-                            IF (led /= "0000") THEN
-                                led <= led - '1';
-                            END IF;
-                            --incrementar vol +
-                        WHEN x"A8" =>
-                            IF (led /= "1111") THEN
-                                led <= led + '1';
-                            END IF;                        
-                        
-                        WHEN OTHERS => led <= "0000";
-                    END CASE;
-
-                ELSE
-                    led <= dig;
-                END IF;
-
-            END IF;
-        END IF;
-    END PROCESS;
-
     --Botão 1
     synch_1 : ENTITY work.synch_btn
         PORT MAP(
@@ -142,17 +110,12 @@ BEGIN
             bounce_i => btn3_sync,
             debounce_o => btn3_deb
         );
--- aqui tem rever toda a logica 
-    alarme : ENTITY work.alarme
+    --IR Sincronizador
+    synch_IR : ENTITY work.synch_btn
         PORT MAP(
             clock => clock,
-            reset => reset,
-            btn1 =>btn1_deb,
-            btn2 =>btn2_deb,
-            btn3 =>btn3_deb,
-            senha_in => dig,
-            led_out => led,
-            buzz_out => buzzer_en
+            async_i => ir_in,
+            sync_o => ir_sync
         );
 
     ir : ENTITY work.ir
@@ -172,4 +135,16 @@ BEGIN
             buzz => buzzer_o
         );
 
+    -- aqui tem rever toda a logica 
+    alarme : ENTITY work.alarme
+        PORT MAP(
+            clock => clock,
+            reset => reset,
+            btn1 => btn1_deb,
+            btn2 => btn2_deb,
+            btn3 => btn3_deb,
+            senha_in => dig,
+            led_out => led,
+            buzz_out => buzzer_en
+        );
 END main_alarme_top;
