@@ -43,23 +43,29 @@ BEGIN
                     END IF;
 
                 WHEN ARMADO =>
+                    led_out <= "0001";
+                    buzz_out <= '0';
                     IF (btn2 = '1') THEN
                         FSM <= DISPARANDO;
                     ELSIF (btn3 = '1' AND SENHA = senha_in) THEN
                         FSM <= DESARMADO;
                     ELSIF (btn3 = '1' AND SENHA /= senha_in) THEN
-                    --aqui poderia pescar os led
-                    -- e dar um bipe diferente
-                        FSM <= DISPARANDO;
+                        led_out <= "0101";
+                        buzz_out <= '1';
+                        -- e dar um bipe diferente
+                        FSM <= ARMADO;
                     END IF;
 
                 WHEN DISPARANDO =>
                     buzz_out <= '1';
+                    led_out <= "1111";
                     IF (btn3 = '1' AND SENHA = senha_in) THEN
                         FSM <= DESARMADO;
-                        -- ELSIF (btn3 = '1' AND SENHA /= senha_in) THEN
-                        -- --aqui poderia pescar os led
-                        -- -- e dar um bipe diferente
+                    ELSIF (btn3 = '1' AND SENHA /= senha_in) THEN
+                        led_out <= "0101";
+                        buzz_out <= '0';
+                        -- e dar um bipe diferente
+                        FSM <= DISPARANDO;
                     END IF;
 
             END CASE;
