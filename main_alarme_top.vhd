@@ -42,6 +42,7 @@ ARCHITECTURE main_alarme_top OF main_alarme_top IS
     SIGNAL command_o : STD_LOGIC_VECTOR(7 DOWNTO 0);
     --buzzer
     SIGNAL buzzer_en : STD_LOGIC;
+    SIGNAL buzzer_out_alarme : STD_LOGIC;
 BEGIN
 
     --inverter sinais por causa do FPGA
@@ -50,6 +51,7 @@ BEGIN
     btn1_sync <= NOT btn1_n_sync;
     btn2_sync <= NOT btn2_n_sync;
     btn3_sync <= NOT btn3_n_sync;
+    buzzer_en <= buzzer_out_alarme;
 
     PROCESS (command_o)
     BEGIN
@@ -145,6 +147,6 @@ BEGIN
             btn3 => btn3_deb,
             senha_in => dig,
             led_out => led,
-            buzz_out => buzzer_en
+            buzz_out => buzzer_out_alarme
         );
 END main_alarme_top;

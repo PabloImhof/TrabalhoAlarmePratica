@@ -27,7 +27,7 @@ BEGIN
 
     PROCESS (clock, reset)
     BEGIN
-        IF reset = '0' THEN
+        IF reset = '1' THEN
             FSM <= DESARMADO;
             led_out <= (OTHERS => '0');
 
