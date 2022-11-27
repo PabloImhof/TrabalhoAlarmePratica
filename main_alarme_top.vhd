@@ -26,6 +26,8 @@ END main_alarme_top;
 ARCHITECTURE main_alarme_top OF main_alarme_top IS
 
     SIGNAL reset : STD_LOGIC;
+    SIGNAL reset_bouncer_in : STD_LOGIC;
+    SIGNAL reset_bouncer_out : STD_LOGIC;
     SIGNAL led : STD_LOGIC_VECTOR(3 DOWNTO 0);
     SIGNAL dig : STD_LOGIC_VECTOR(3 DOWNTO 0);
 
@@ -45,6 +47,11 @@ ARCHITECTURE main_alarme_top OF main_alarme_top IS
     SIGNAL ir_sync : STD_LOGIC;
     SIGNAL interrupcao_o : STD_LOGIC;
     SIGNAL command_o : STD_LOGIC_VECTOR(7 DOWNTO 0);
+
+    SIGNAL btn1_ir : STD_LOGIC;
+    SIGNAL btn2_ir : STD_LOGIC;
+    SIGNAL btn3_ir : STD_LOGIC;
+
     --buzzer
     SIGNAL buzzer_en : STD_LOGIC;
     SIGNAL buzzer_out_alarme : STD_LOGIC;
@@ -63,18 +70,21 @@ ARCHITECTURE main_alarme_top OF main_alarme_top IS
     SIGNAL enable : STD_LOGIC_VECTOR(3 DOWNTO 0); --quantos digitos liga no visor
 
     SIGNAL cntr : STD_LOGIC_VECTOR(3 DOWNTO 0); --conta a casa que deve colocar o numero no visor
+    SIGNAL cntr_ir : STD_LOGIC_VECTOR(24 DOWNTO 0);
 
 BEGIN
 
     --inverter sinais por causa do FPGA
-    reset <= NOT reset_n;
+    reset_bouncer_in <= NOT reset_n;
+    reset <= reset_bouncer_out;
+
     led_n <= NOT led;
     btn1_sync <= NOT btn1_n_sync;
     btn2_sync <= NOT btn2_n_sync;
     btn3_sync <= NOT btn3_n_sync;
     buzzer_en <= buzzer_out_alarme;
 
-    -- enable <= "1111";
+
     --apaga visor que não tem valor
     PROCESS (cntr, vsr0, vsr1, vsr2, vsr3)
     BEGIN
@@ -114,24 +124,43 @@ BEGIN
     PROCESS (clock, reset)
     BEGIN
         IF reset = '1' THEN
-            -- led <= (OTHERS => '0');
-            -- buzzer_en <= '0';
             vsr0 <= (OTHERS => '0');
             vsr1 <= (OTHERS => '0');
             vsr2 <= (OTHERS => '0');
             vsr3 <= (OTHERS => '0');
             cntr <= (OTHERS => '0');
+            btn1_ir <= '0';
+            btn2_ir <= '0';
+            btn3_ir <= '0';
 
         ELSIF rising_edge(clock) THEN
-            IF interrupcao_o = '1' THEN
-                IF dig = "1111" THEN -- se digito não for numero é comando              
-                    vsr0 <= (OTHERS => '0');
-                    vsr1 <= (OTHERS => '0');
-                    vsr2 <= (OTHERS => '0');
-                    vsr3 <= (OTHERS => '0');
-                    cntr <= (OTHERS => '0');
-                ELSE -- se não comando recebe direto digito
+            --esse cntr por que ficava travado o valor no btn do ir
+            cntr_ir <= cntr_ir + 1;
+            IF (cntr_ir = "0000000000000000000000" OR interrupcao_o = '1') THEN
+                btn1_ir <= '0';
+                btn2_ir <= '0';
+                btn3_ir <= '0';
+            END IF;
 
+            IF interrupcao_o = '1' THEN
+                IF dig = "1111" THEN -- se digito não for numero é comando     
+
+                    CASE command_o IS
+                        WHEN x"A2" =>
+                            btn1_ir <= '1';
+                        WHEN x"62" =>
+                            btn2_ir <= '1';
+                        WHEN x"E2" =>
+                            btn3_ir <= '1';
+                        WHEN OTHERS =>
+                            vsr0 <= (OTHERS => '0');
+                            vsr1 <= (OTHERS => '0');
+                            vsr2 <= (OTHERS => '0');
+                            vsr3 <= (OTHERS => '0');
+                            cntr <= (OTHERS => '0');
+                    END CASE;
+
+                ELSE -- se não comando recebe direto digito
                     --fazer contador que conta o numero de vezes que clicou no dig
                     cntr <= cntr + 1;
                     IF (cntr <= "0011") THEN
@@ -171,6 +200,15 @@ BEGIN
             END IF;
         END IF;
     END PROCESS;
+
+    --debouncer reset, pois estava ficando ativado na placa.
+    debounce_reset : ENTITY work.debounce
+        PORT MAP(
+            clock => clock,
+            reset => '0',
+            bounce_i => reset_bouncer_in,
+            debounce_o => reset_bouncer_out
+        );
 
     --Botão 1
     synch_1 : ENTITY work.synch_btn
@@ -231,31 +269,6 @@ BEGIN
             command => command_o
         );
 
-    buzzer : ENTITY work.buzzer
-        PORT MAP(
-            clock => clock,
-            reset => reset,
-            en => buzzer_en,
-            buzz => buzzer_o
-        );
-
-    -- aqui tem rever toda a logica 
-    alarme : ENTITY work.alarme
-        PORT MAP(
-            clock => clock,
-            reset => reset,
-            btn1 => btn1_deb,
-            btn2 => btn2_deb,
-            btn3 => btn3_deb,
-            senhavsr0_in => vsr0,
-            senhavsr1_in => vsr1,
-            senhavsr2_in => vsr2,
-            senhavsr3_in => vsr3,
-            -- senha_in => dig,
-            led_out => led,
-            buzz_out => buzzer_out_alarme
-        );
-
     dec0 : ENTITY work.SevenSegmentDecoder
         PORT MAP(
             bcd_i => vsr0,
@@ -292,6 +305,32 @@ BEGIN
             seg3_i => seg3, -- recebe o valor ja pronto e montado dos anodo do DECODER
             seg_no => seg_no, -- manda o valor
             sel_no => sel_no -- manda qual é a casa
+        );
+        --só fica invertendo o sinal do buzzer para sair o som
+    buzzer : ENTITY work.buzzer
+        PORT MAP(
+            clock => clock,
+            reset => reset,
+            en => buzzer_en,
+            buzz => buzzer_o
+        );
+
+    alarme : ENTITY work.alarme
+        PORT MAP(
+            clock => clock,
+            reset => reset,
+            btn1 => btn1_deb,
+            btn2 => btn2_deb,
+            btn3 => btn3_deb,
+            btn1_ir_in => btn1_ir,
+            btn2_ir_in => btn2_ir,
+            btn3_ir_in => btn3_ir,
+            senhavsr0_in => vsr0,
+            senhavsr1_in => vsr1,
+            senhavsr2_in => vsr2,
+            senhavsr3_in => vsr3,
+            led_out => led,
+            buzz_out => buzzer_out_alarme
         );
 
 END main_alarme_top;
