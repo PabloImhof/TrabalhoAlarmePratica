@@ -8,6 +8,7 @@ ENTITY buzzer IS
         reset : IN STD_LOGIC;
 
         en : IN STD_LOGIC;
+        in_div : IN STD_LOGIC_VECTOR (20 DOWNTO 0);
         buzz : OUT STD_LOGIC
     );
 END buzzer;
@@ -23,7 +24,11 @@ BEGIN
         IF (reset = '1') THEN
             cnt <= (OTHERS => '0');
         ELSIF (rising_edge(clock)) THEN
-            cnt <= cnt + '1';
+            IF (cnt = in_div) THEN
+                cnt <= (OTHERS => '0');
+            ELSE
+                cnt <= cnt + '1';
+            END IF;
         END IF;
     END PROCESS;
     PROCESS (clock, reset)

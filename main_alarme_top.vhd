@@ -11,7 +11,6 @@ ENTITY main_alarme_top IS
         btn2_n : IN STD_LOGIC;
         btn3_n : IN STD_LOGIC;
         ir_in : IN STD_LOGIC;
-
         --LED
         led_n : OUT STD_LOGIC_VECTOR(3 DOWNTO 0);
         --BUZZER
@@ -19,7 +18,6 @@ ENTITY main_alarme_top IS
         --VISOR
         seg_no : OUT STD_LOGIC_VECTOR(7 DOWNTO 0);
         sel_no : OUT STD_LOGIC_VECTOR(3 DOWNTO 0)
-
     );
 END main_alarme_top;
 
@@ -47,21 +45,18 @@ ARCHITECTURE main_alarme_top OF main_alarme_top IS
     SIGNAL ir_sync : STD_LOGIC;
     SIGNAL interrupcao_o : STD_LOGIC;
     SIGNAL command_o : STD_LOGIC_VECTOR(7 DOWNTO 0);
-
     SIGNAL btn1_ir : STD_LOGIC;
     SIGNAL btn2_ir : STD_LOGIC;
     SIGNAL btn3_ir : STD_LOGIC;
-
     --buzzer
     SIGNAL buzzer_en : STD_LOGIC;
     SIGNAL buzzer_out_alarme : STD_LOGIC;
-
+    SIGNAL div : STD_LOGIC_VECTOR (20 DOWNTO 0);
     --7segmentos valor anodo
     SIGNAL seg0 : STD_LOGIC_VECTOR(6 DOWNTO 0);
     SIGNAL seg1 : STD_LOGIC_VECTOR(6 DOWNTO 0);
     SIGNAL seg2 : STD_LOGIC_VECTOR(6 DOWNTO 0);
     SIGNAL seg3 : STD_LOGIC_VECTOR(6 DOWNTO 0);
-
     --recebe o numero PARA ele e devolve o numero montado nos anodos.
     SIGNAL vsr0 : STD_LOGIC_VECTOR(3 DOWNTO 0);
     SIGNAL vsr1 : STD_LOGIC_VECTOR(3 DOWNTO 0);
@@ -83,7 +78,6 @@ BEGIN
     btn2_sync <= NOT btn2_n_sync;
     btn3_sync <= NOT btn3_n_sync;
     buzzer_en <= buzzer_out_alarme;
-
 
     --apaga visor que não tem valor
     PROCESS (cntr, vsr0, vsr1, vsr2, vsr3)
@@ -143,8 +137,7 @@ BEGIN
             END IF;
 
             IF interrupcao_o = '1' THEN
-                IF dig = "1111" THEN -- se digito não for numero é comando     
-
+                IF dig = "1111" THEN -- se digito não for numero é comando  
                     CASE command_o IS
                         WHEN x"A2" =>
                             btn1_ir <= '1';
@@ -178,7 +171,6 @@ BEGIN
                             vsr2 <= vsr1;
                             vsr1 <= vsr0;
                             vsr0 <= dig;
-
                         END IF;
 
                         IF (cntr = "0011") THEN
@@ -200,7 +192,7 @@ BEGIN
             END IF;
         END IF;
     END PROCESS;
-
+ 
     --debouncer reset, pois estava ficando ativado na placa.
     debounce_reset : ENTITY work.debounce
         PORT MAP(
@@ -306,14 +298,6 @@ BEGIN
             seg_no => seg_no, -- manda o valor
             sel_no => sel_no -- manda qual é a casa
         );
-        --só fica invertendo o sinal do buzzer para sair o som
-    buzzer : ENTITY work.buzzer
-        PORT MAP(
-            clock => clock,
-            reset => reset,
-            en => buzzer_en,
-            buzz => buzzer_o
-        );
 
     alarme : ENTITY work.alarme
         PORT MAP(
@@ -330,7 +314,18 @@ BEGIN
             senhavsr2_in => vsr2,
             senhavsr3_in => vsr3,
             led_out => led,
-            buzz_out => buzzer_out_alarme
+            buzz_out => buzzer_out_alarme,
+            div_out => div
+        );
+
+    --só fica invertendo o sinal do buzzer para sair o som
+    buzzer : ENTITY work.buzzer
+        PORT MAP(
+            clock => clock,
+            reset => reset,
+            en => buzzer_en,
+            in_div => div,
+            buzz => buzzer_o
         );
 
 END main_alarme_top;
