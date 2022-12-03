@@ -166,8 +166,7 @@ BEGIN
                 WHEN DESLIGA =>
                     div_out <= "000000010011100010000";
                     buzz_out <= '1';
-                    IF (cntr_buzz > x"2000000") THEN
-                        -- cntrDisp <= '1';
+                    IF (cntr_buzz > x"2000000") THEN                     
                         buzz_out <= '0';
 
                         IF (FSM = DESARMADO) THEN

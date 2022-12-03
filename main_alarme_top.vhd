@@ -28,7 +28,6 @@ ARCHITECTURE main_alarme_top OF main_alarme_top IS
     SIGNAL reset_bouncer_out : STD_LOGIC;
     SIGNAL led : STD_LOGIC_VECTOR(3 DOWNTO 0);
     SIGNAL dig : STD_LOGIC_VECTOR(3 DOWNTO 0);
-
     --Botão de negação do sincronizador
     SIGNAL btn1_n_sync : STD_LOGIC;
     SIGNAL btn2_n_sync : STD_LOGIC;
@@ -66,9 +65,9 @@ ARCHITECTURE main_alarme_top OF main_alarme_top IS
 
     SIGNAL cntr : STD_LOGIC_VECTOR(3 DOWNTO 0); --conta a casa que deve colocar o numero no visor
     SIGNAL cntr_ir : STD_LOGIC_VECTOR(24 DOWNTO 0);
+    SIGNAL limpar : STD_LOGIC;
 
 BEGIN
-
     --inverter sinais por causa do FPGA
     reset_bouncer_in <= NOT reset_n;
     reset <= reset_bouncer_out;
@@ -126,14 +125,27 @@ BEGIN
             btn1_ir <= '0';
             btn2_ir <= '0';
             btn3_ir <= '0';
+            limpar <= '0';
 
         ELSIF rising_edge(clock) THEN
-            --esse cntr por que ficava travado o valor no btn do ir
+            --esse cntr por que ficava travado o valor no btn do ir -- reseta o valor recebido pelo ir
             cntr_ir <= cntr_ir + 1;
             IF (cntr_ir = "0000000000000000000000" OR interrupcao_o = '1') THEN
                 btn1_ir <= '0';
                 btn2_ir <= '0';
                 btn3_ir <= '0';
+                limpar <= '0';
+                IF (btn3_ir = '1' OR limpar = '1' ) THEN
+                    vsr0 <= (OTHERS => '0');
+                    vsr1 <= (OTHERS => '0');
+                    vsr2 <= (OTHERS => '0');
+                    vsr3 <= (OTHERS => '0');
+                    cntr <= (OTHERS => '0');
+                END IF;
+            END IF;
+
+            IF (btn3_deb = '1') THEN
+                limpar <= '1';
             END IF;
 
             IF interrupcao_o = '1' THEN
@@ -192,7 +204,7 @@ BEGIN
             END IF;
         END IF;
     END PROCESS;
- 
+
     --debouncer reset, pois estava ficando ativado na placa.
     debounce_reset : ENTITY work.debounce
         PORT MAP(

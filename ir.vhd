@@ -16,7 +16,7 @@ end entity;
 
 architecture rlt of ir is
 	type fsm_t is (IDLE, LEAD_9, LEAD_4, DATA);
-	-- attribute enum_encoding of fsm_t : type is "one-hot"; -- Testar se ok
+
     signal state      : fsm_t;
 	signal next_state : fsm_t;
 
@@ -58,14 +58,6 @@ begin
 		end if;
 	end process;
 
-	-- F = 50.000.000 (50 MHz)
-	-- p = 1/50MHz = 20 ns
-	-- >>>> 9 ms
-	-- c = 9 ms / 20 ns = 0.009/0.000000020 = 450'000
-	-- 2^16 - 1 = 65536 - 1 = 65'535
-	-- 2^17 - 1 = 13...
-	-- 2^18 - 1 = 26x....
-	-- 2^19 - 1 = 524'287
 	-- Portanto, 19 bits é suficiente para armazenar a contagem até 450k
 	process(clk, rst)
 	begin
