@@ -1,25 +1,46 @@
-# TrabalhoAlarmePratica
-Projeto de Alarme em FPGA 
+# README: TrabalhoAlarmePratica - Projeto de Alarme em FPGA
 
+## Descrição
 
-Repositório a fim de desenvolver um projeto de alarme em VHDL utilizando um FPGA.
-Prática Profissional, e trabalho em grupo.
+Este repositório foi criado para o desenvolvimento de um projeto prático de alarme usando VHDL e FPGA. Foi desenvolvido como parte de uma atividade de Prática Profissional.
 
-Código feito em VHDL.
+## Funcionalidades
 
-Onde simula um alarme da seguinte forma.
+O projeto simula um sistema de alarme com as seguintes características:
 
-Estado AGUARDANDO o FPGA fica aguardando do comando LIGAR pelo Botão S1 ou pelo Controle IR tecla CH-
+1. **Estado AGUARDANDO**: 
+   - O FPGA permanece neste estado até receber o comando de ativação.
+   - O comando pode ser acionado pelo Botão S1 ou pelo Controle IR (tecla CH-).
+  
+2. **Estado ATIVO**:
+   - Ao ativar, o LED 1 começa a piscar, indicando que o sistema de alarme está ligado.
+   - Um aviso sonoro é emitido pelo buzzer como sinal de ativação.
+   - Enquanto estiver ativo, o alarme pode ser desativado inserindo-se uma senha de 4 dígitos (padrão 1644) através do Controle IR.
+   - A senha inserida será exibida nos 4 visores de 7 segmentos.
+   - Após inserir a senha, é necessário pressionar o BTN S3 ou a tecla CH+ do IR para verificar a senha.
+  
+3. **Verificação de Senha**:
+   - Se a senha for inserida incorretamente, os LEDs mostrarão o padrão 0101 e um sinal sonoro indicará erro. O sistema retornará ao estado anterior (Ativo ou Disparando).
+   - Se a senha for correta, um sinal sonoro de desarme será emitido e o sistema retornará ao estado de AGUARDO.
 
-Ao clicar em um dos botões irá ser ATIVO o alarme onde o LED 1 fica piscando e 1 aviso sonoro é enviado pelo buzzer sinalizando que o mesmo está ligado.
+4. **Disparo do Alarme**:
+   - No estado ativo, pressionando o BTN S2 ou a tecla CH do IR simula-se a detecção de uma presença (como se fosse um sensor de presença).
+   - O alarme será acionado, fazendo os LEDs piscarem intermitentemente.
+   - O buzzer soará em duas frequências diferentes até que a senha correta seja inserida e o alarme seja desativado.
 
+## Hardware Utilizado
 
-No estado de ATIVO o alarme pode ser DESATIVADO através da inserção de senha de 4 dígitos 1644 utilizando o controle IR para informar a senha, que será mostrada nos 4 visores de 7 Segmentos.
+- FPGA
+- Botões (S1, S2, S3)
+- Controle IR
+- 4 visores de 7 segmentos
+- LED
+- Buzzer
 
-Após informar a senha deve se clicar no BTN S3 ou CH+ do IR para verificação da senha.
+## Linguagem
 
-Se incorreta a senha volta ao estado anterior a verificação (Ativo, ou Disparando) acende 0101 LED e sinaliza com sinal sonoro o erro.
-Caso correta Sinaliza com sinal sonoro de DESARME e volta para o estado de AGUARDO.
+O código deste projeto foi desenvolvido em VHDL.
 
-Quando ativo o alarme pode se clicar no BTN S2 ou CH do IR para simular um sensor de presença onde o alarme irá disparar, piscando os led de forma intermitente e ficar disparando o buzzer em 2 frequências diferentes até que seja inserido a senha correta e desativado o alarme.
+## Conclusão
 
+Este projeto prático proporcionou uma oportunidade valiosa para aprender sobre o desenvolvimento de sistemas de alarme em FPGA usando VHDL. A simulação do sistema de alarme foi bem-sucedida e cumpriu todos os requisitos propostos.
