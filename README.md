@@ -1,4 +1,4 @@
-# README: TrabalhoAlarmePratica - Projeto de Alarme em FPGA
+# Projeto de Alarme em FPGA
 
 ## Descrição
 
